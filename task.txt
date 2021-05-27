@@ -1,0 +1,35 @@
+
+const findNearbyFoodPlaces = (requestParam) => {
+  try {
+    if (!requestParam.latitude && !requestParam.longitude) {
+      throw new Error("Parameters Missing!");
+    }
+    let dbQuery = {};
+    dbQuery.location = {
+      $near: {
+        $geometry: {
+          type: "Point",
+          coordinates: [
+            parseFloat(requestParam.longitude),
+            parseFloat(requestParam.latitude),
+          ],
+        },
+        $maxDistance: 5000, //5km radius, you can keep it static or dynamic depending on how you want to go about it.
+        //$maxDistance : Number(requestParam.radius * 1000) radius in kms
+      },
+    };
+
+    const mongoQuery = mongoose
+      .model("mobileFoodFacilityPermit")
+      .find(dbQuery, {}, (error, data) => { // you can change what fields you want to get(out of the 24 columns) in this line.Right now it will return all columns
+        if (error) {
+          return error;
+        } else {
+          console.log(data);
+        }
+      });
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
+};
